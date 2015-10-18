@@ -298,6 +298,7 @@ public final class Utils
 	
 	public final static int[] computeSequenceHashes(final String seq, final int kmerSize)
 	{
+		//FIXME Não devemos mexer nesse calculo de hash tambem para nao contar os pedaços de sequencia que tem N???
 		// RollingSequenceHash rabinHash = new RollingSequenceHash(kmerSize);
 		// final int[] rabinHashes = rabinHash.hashInt(seq);
 

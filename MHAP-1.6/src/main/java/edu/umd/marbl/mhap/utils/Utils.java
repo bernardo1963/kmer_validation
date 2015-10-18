@@ -85,6 +85,7 @@ public final class Utils
 
 	public enum Translate
 	{
+		//TODO Alterar aqui tambem??
 		A("T"), B("V"), C("G"), D("H"), G("C"), H("D"), K("M"), M("K"), N("N"), R("Y"), S("S"), T("A"), V("B"), W("W"), Y(
 				"R");
 
