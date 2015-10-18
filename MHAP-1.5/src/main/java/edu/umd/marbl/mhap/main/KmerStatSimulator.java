@@ -337,8 +337,7 @@ public class KmerStatSimulator {
 			sequences = new String[data.getNumberProcessed()];
 			int i = 0;
 			while (!data.isEmpty())
-				//FIXME Carlos
-				sequences[i++] = data.dequeue(false).getString().toUpperCase().replace("N", "");
+				sequences[i++] = data.dequeue().getString().toUpperCase().replace("N", "");
 		}
 		System.err.println("Loaded reference");
 		

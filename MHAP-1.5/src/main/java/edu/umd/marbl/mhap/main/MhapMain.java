@@ -330,13 +330,12 @@ public final class MhapMain
 				{
 					try
 					{
-						//FIXME Carlos
-						Sequence seq = data.dequeue(true);
+						Sequence seq = data.dequeue();
 						while (seq != null)
 						{
 							
 							//get the kmers integers
-							//Carlos
+							//FIXME Carlos
 							//long[] kmerHashes = Utils.computeSequenceHashesLong(seq.getString(), MhapMain.this.kmerSize, 0);
 							long[] kmerHashes = Utils.computeSequenceHashesLong(seq.getString().replaceAll("[atcgn]", "N"), MhapMain.this.kmerSize, 0);
 							
@@ -346,7 +345,7 @@ public final class MhapMain
 							
 							//get the kmers integers for reverse compliment
 							//kmerHashes = Utils.computeSequenceHashesLong(seq.getReverseCompliment().getString(), MhapMain.this.kmerSize, 0);
-							//Carlos
+							//FIXME Carlos
 							kmerHashes = Utils.computeSequenceHashesLong(seq.getReverseCompliment().getString().replaceAll("[atcgn]", "N"), MhapMain.this.kmerSize, 0);
 							
 							//store the values
@@ -357,7 +356,7 @@ public final class MhapMain
 							if (currCount % 5000 == 0)
 								System.err.println("Kmers counted for " + currCount + " sequences (including reverse compliment)...");
 
-							seq = data.dequeue(true);
+							seq = data.dequeue();
 						}
 					}
 					catch (IOException e)
@@ -481,7 +480,6 @@ public final class MhapMain
 		//System.err.println("Press Enter...");
 		//System.in.read();
 		
-		//TODO: fase 2 starts here??
 		// now that we have the hash constructed, go through all sequences to recompute their min and score their matches
 		if (this.toFile==null || this.toFile.isEmpty())
 		{

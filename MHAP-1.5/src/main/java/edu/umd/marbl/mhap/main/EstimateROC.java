@@ -433,7 +433,7 @@ public class EstimateROC {
 		int i = 0;
 		while (!data.isEmpty()) {
 			//FIXME Carlos
-			this.dataSeq[i++] = data.dequeue(false);
+			this.dataSeq[i++] = data.dequeue();
 		}
 	}
 	

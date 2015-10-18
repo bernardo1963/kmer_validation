@@ -124,8 +124,7 @@ public class SequenceSketchStreamer
 		SequenceSketch seqHashes;
 		if (this.readingFasta)
 		{
-			//FIXME Carlos
-			Sequence seq = this.fastaData.dequeue(false);
+			Sequence seq = this.fastaData.dequeue();
 
 			// compute the hashes
 			seqHashes = null;

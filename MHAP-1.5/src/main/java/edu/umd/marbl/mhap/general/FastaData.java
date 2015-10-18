@@ -45,8 +45,6 @@ public class FastaData implements Cloneable
 	private String lastLine;
 	private AtomicLong numberProcessed;
 	private boolean readFullFile;
-	//FIXME Carlos
-	private boolean isFaseOne;
 	// length of sequences loaded
 	private final ConcurrentLinkedQueue<Sequence> sequenceList;
 
@@ -101,15 +99,13 @@ public class FastaData implements Cloneable
 		return new FastaData(this.sequenceList);
 	}
 
-	//FIXME Carlos
-	public Sequence dequeue(boolean isFaseOne) throws IOException
+	public Sequence dequeue() throws IOException
 	{
 		Sequence seq;
 		synchronized (this.sequenceList)
 		{
 			if (this.sequenceList.isEmpty())
 			{
-				this.isFaseOne = isFaseOne;
 				enqueueNextSequenceInFile();
 			}
 	
@@ -175,15 +171,7 @@ public class FastaData implements Cloneable
 					//Sequence seq = new Sequence(fastaSeq.toString().toUpperCase(Locale.ENGLISH), id);
 
 					//FIXME Carlos
-					Sequence seq;
-					if(this.isFaseOne)
-					{
-						seq = new Sequence(fastaSeq.toString(), id);
-					}
-					else
-					{
-						seq = new Sequence(fastaSeq.toString().toUpperCase(Locale.ENGLISH), id);
-					}
+					Sequence seq = new Sequence(fastaSeq.toString(), id);
 					
 					// enqueue sequence
 					this.sequenceList.add(seq);
