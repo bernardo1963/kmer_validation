@@ -1,10 +1,5 @@
+/buildMulti.class
 /Utils$Pair.class
 /Utils$ToProtein.class
 /Utils$Translate.class
 /Utils.class
-/buildMulti.class
-/bin
-/target
-/classes/
-.project
-.classpath
