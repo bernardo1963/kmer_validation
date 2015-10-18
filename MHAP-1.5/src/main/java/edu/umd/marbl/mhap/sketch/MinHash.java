@@ -258,7 +258,9 @@ public final class MinHash implements Serializable
 		//this.minHashes = MinHash.computeKmerMinHashes(seq.getString(), kmerSize, numHashes, filter);
 		//this.minHashes = MinHash.computeKmerMinHashesWeighted(seq.getString(), kmerSize, numHashes, filter);
 		//this.minHashes = MinHash.computeKmerMinHashesWeightedInt(seq.getString(), kmerSize, numHashes, filter, kmerCount);
-		this.minHashes = MinHash.computeKmerMinHashesWeightedIntSuper(seq.getString(), kmerSize, numHashes, filter, kmerCount, weighted);
+		//this.minHashes = MinHash.computeKmerMinHashesWeightedIntSuper(seq.getString(), kmerSize, numHashes, filter, kmerCount, weighted);
+		//FIXME Carlos
+		this.minHashes = MinHash.computeKmerMinHashesWeightedIntSuper(seq.getString().replaceAll("[atcgn]", "N"), kmerSize, numHashes, filter, kmerCount, weighted);
 	}
 	
 	public MinHash(String str, int kmerSize, int numHashes)
