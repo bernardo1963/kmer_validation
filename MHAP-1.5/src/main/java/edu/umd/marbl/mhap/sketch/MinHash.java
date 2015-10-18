@@ -118,7 +118,7 @@ public final class MinHash implements Serializable
 			if (weight<=0)
 				continue;
 		
-			long x = key;
+			/*long x = key;
 			
 			for (int word = 0; word < numHashes; word++)
 			{
@@ -133,6 +133,31 @@ public final class MinHash implements Serializable
 					{
 						best[word] = x;
 						hashes[word] = (int)key;
+					}
+				}
+			}*/
+			//FIXME Carlos
+			long x = key;
+			if(x != Long.MAX_VALUE)
+			{
+				for (int word = 0; word < numHashes; word++)
+				{
+					for (int count = 0; count<weight; count++)
+					{				
+						// XORShift Random Number Generators
+						x ^= (x << 21);
+						x ^= (x >>> 35);
+						x ^= (x << 4);
+						
+						//Carlos: Alterei tambem esse codigo para ficar igual com o da versao 1.6
+						if (x < best[word])
+						{
+							best[word] = x;
+							if (word%2==0)
+								hashes[word] = (int)key;
+							else
+								hashes[word] = (int)(key>>>32);
+						}
 					}
 				}
 			}
