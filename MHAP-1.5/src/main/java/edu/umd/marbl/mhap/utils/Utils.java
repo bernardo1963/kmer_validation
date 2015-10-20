@@ -324,11 +324,14 @@ public final class Utils
 			//FIXME Carlos
 			String kmer = seq.substring(iter, iter + kmerSize);
 			
-			if(!kmer.contains("N"))
+			if(kmer.contains("N"))
+			{
+				hashes[iter] = Long.MAX_VALUE;
+			}
+			else
 			{
 				HashCode hc = hf.newHasher().putUnencodedChars(kmer).hash();
 				hashes[iter] = hc.asLong();
-				
 			}
 		}
 

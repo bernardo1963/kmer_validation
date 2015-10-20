@@ -149,14 +149,10 @@ public final class MinHash implements Serializable
 						x ^= (x >>> 35);
 						x ^= (x << 4);
 						
-						//Carlos: Alterei tambem esse codigo para ficar igual com o da versao 1.6
 						if (x < best[word])
 						{
 							best[word] = x;
-							if (word%2==0)
-								hashes[word] = (int)key;
-							else
-								hashes[word] = (int)(key>>>32);
+							hashes[word] = (int)key;
 						}
 					}
 				}
