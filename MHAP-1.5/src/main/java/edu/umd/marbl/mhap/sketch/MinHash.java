@@ -64,7 +64,10 @@ public final class MinHash implements Serializable
 	
 		if (numberKmers < 1)
 			throw new MhapRuntimeException("Kmer size bigger than string length.");
-	
+		
+		
+		HashSet<Long> validKmers = Utils.computeSequenceHashesLongSMFiltered(seq.replaceAll("[atgcn]", "N"), kmerSize, 0);
+		
 		// get the kmer hashes
 		final long[] kmerHashes = Utils.computeSequenceHashesLong(seq, kmerSize, 0);
 		
@@ -96,6 +99,9 @@ public final class MinHash implements Serializable
 			long key = kmer.getKey();
 			int weight = kmer.getValue().count;
 			
+			if(!validKmers.contains(key))
+				continue;
+			
 			if (kmerCount!=null || filter != null)
 			{				
 				if ((kmerCount!=null && kmerCount.documentFrequencyRatio(key)>kmerCount.getFilterCutoff()) || (filter != null && filter.contains(key)))
@@ -117,8 +123,8 @@ public final class MinHash implements Serializable
 			
 			if (weight<=0)
 				continue;
-		
-			/*long x = key;
+			
+			long x = key;
 			
 			for (int word = 0; word < numHashes; word++)
 			{
@@ -133,27 +139,6 @@ public final class MinHash implements Serializable
 					{
 						best[word] = x;
 						hashes[word] = (int)key;
-					}
-				}
-			}*/
-			//FIXME Carlos
-			long x = key;
-			if(x != Long.MAX_VALUE)
-			{
-				for (int word = 0; word < numHashes; word++)
-				{
-					for (int count = 0; count<weight; count++)
-					{				
-						// XORShift Random Number Generators
-						x ^= (x << 21);
-						x ^= (x >>> 35);
-						x ^= (x << 4);
-						
-						if (x < best[word])
-						{
-							best[word] = x;
-							hashes[word] = (int)key;
-						}
 					}
 				}
 			}
@@ -281,7 +266,7 @@ public final class MinHash implements Serializable
 		//this.minHashes = MinHash.computeKmerMinHashesWeightedInt(seq.getString(), kmerSize, numHashes, filter, kmerCount);
 		//this.minHashes = MinHash.computeKmerMinHashesWeightedIntSuper(seq.getString(), kmerSize, numHashes, filter, kmerCount, weighted);
 		//FIXME Carlos
-		this.minHashes = MinHash.computeKmerMinHashesWeightedIntSuper(seq.getString().replaceAll("[atcgn]", "N"), kmerSize, numHashes, filter, kmerCount, weighted);
+		this.minHashes = MinHash.computeKmerMinHashesWeightedIntSuper(seq.getString(), kmerSize, numHashes, filter, kmerCount, weighted);
 	}
 	
 	public MinHash(String str, int kmerSize, int numHashes)

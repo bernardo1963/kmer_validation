@@ -34,6 +34,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Random;
 import java.io.File;
 import java.io.BufferedReader;
@@ -321,21 +322,45 @@ public final class Utils
 		long[] hashes = new long[seq.length() - kmerSize + 1];
 		for (int iter = 0; iter < hashes.length; iter++)
 		{
-			//FIXME Carlos
-			String kmer = seq.substring(iter, iter + kmerSize);
 			
-			if(kmer.contains("N"))
-			{
-				hashes[iter] = Long.MAX_VALUE;
-			}
-			else
-			{
-				HashCode hc = hf.newHasher().putUnencodedChars(kmer).hash();
-				hashes[iter] = hc.asLong();
-			}
+//			HashCode hc = hf.newHasher().putUnencodedChars(seq.substring(iter, iter + kmerSize)).hash();
+//			hashes[iter] = hc.asLong();
+			
+			//FIXME Carlos
+			HashCode hc = hf.newHasher().putUnencodedChars(seq.substring(iter, iter + kmerSize).toUpperCase(Locale.ENGLISH)).hash();
+			hashes[iter] = hc.asLong();
 		}
 
 		return hashes;
+	}
+	
+	public static HashSet<Long> computeSequenceHashesLongSMFiltered(final String seq, final int kmerSize, final int seed) 
+	{
+		HashFunction hf = Hashing.murmur3_128(seed);
+		
+		final int numKmers = seq.length() - kmerSize + 1;
+		
+		String kmer;
+		String kmerReverseComplement;
+		
+		HashSet<Long> validKmers = new HashSet<>(2*numKmers);
+		
+		for (int iter = 0; iter < numKmers; iter++)
+		{
+			kmer = seq.substring(iter, iter + kmerSize);
+			
+			if(!kmer.contains("N"))
+			{
+				kmerReverseComplement = Utils.rc(kmer);
+
+				HashCode hc = hf.newHasher().putUnencodedChars(kmer).hash();
+				validKmers.add(hc.asLong());
+				
+				hc = hf.newHasher().putUnencodedChars(kmerReverseComplement).hash();
+				validKmers.add(hc.asLong());
+			}
+		}
+		return validKmers;
 	}
 
 	// add new line breaks every FASTA_LINE_LENGTH characters
@@ -892,4 +917,5 @@ public final class Utils
 
 		return new String(s);
 	}
+
 }
