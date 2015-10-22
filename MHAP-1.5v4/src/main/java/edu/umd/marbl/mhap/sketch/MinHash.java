@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import edu.umd.marbl.mhap.general.Sequence;
+import edu.umd.marbl.mhap.main.MhapMain;
 import edu.umd.marbl.mhap.utils.MhapRuntimeException;
 import edu.umd.marbl.mhap.utils.HitCounter;
 import edu.umd.marbl.mhap.utils.MersenneTwisterFast;
@@ -98,7 +99,7 @@ public final class MinHash implements Serializable
 			
 			if (kmerCount!=null || filter != null)
 			{				
-				if ((kmerCount!=null && kmerCount.documentFrequencyRatio(key)>kmerCount.getFilterCutoff()) || (filter != null && filter.contains(key)))
+				if ((!MhapMain.getValidKmers().contains(key)) || (kmerCount!=null && kmerCount.documentFrequencyRatio(key)>kmerCount.getFilterCutoff()) || (filter != null && filter.contains(key)))
 				{
 					//System.err.println("Bad = "+kmerCount.inverseDocumentFrequency(key)+", "+kmerCount.weight(key, weight, maxCount));
 					if (!weighted)

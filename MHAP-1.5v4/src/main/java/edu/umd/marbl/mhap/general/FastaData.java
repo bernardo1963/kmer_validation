@@ -40,13 +40,13 @@ import edu.umd.marbl.mhap.utils.Utils;
 
 public class FastaData implements Cloneable
 {
-	private final BufferedReader fileReader;
-	private final int offset;
-	private String lastLine;
-	private AtomicLong numberProcessed;
-	private boolean readFullFile;
+	protected final BufferedReader fileReader;
+	protected final int offset;
+	protected String lastLine;
+	protected AtomicLong numberProcessed;
+	protected boolean readFullFile;
 	// length of sequences loaded
-	private final ConcurrentLinkedQueue<Sequence> sequenceList;
+	protected final ConcurrentLinkedQueue<Sequence> sequenceList;
 
 	private static final String[] fastaSuffix = { "fna", "contigs", "contig", "final", "fasta", "fa" };
 

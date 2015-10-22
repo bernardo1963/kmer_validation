@@ -83,8 +83,12 @@ public final class Utils
 
 	public enum Translate
 	{
+		/*A("T"), B("V"), C("G"), D("H"), G("C"), H("D"), K("M"), M("K"), N("N"), R("Y"), S("S"), T("A"), V("B"), W("W"), Y(
+		"R");*/
+		//FIXME Carlos
 		A("T"), B("V"), C("G"), D("H"), G("C"), H("D"), K("M"), M("K"), N("N"), R("Y"), S("S"), T("A"), V("B"), W("W"), Y(
-				"R");
+		"R"), a("t"), b("v"), c("g"), d("h"), g("c"), h("d"), k("m"), m("k"), n("n"), r("y"), s("s"), t("a"), v("b"), w("w"), y(
+				"r");
 
 		private String other;
 
@@ -873,5 +877,28 @@ public final class Utils
 		s.append("]");
 
 		return new String(s);
+	}
+	
+	public static HashSet<Long> computeSequenceHashesLongSMFiltered(final String seq, final int kmerSize, final int seed) 
+	{
+		HashFunction hf = Hashing.murmur3_128(seed);
+		
+		final int numKmers = seq.length() - kmerSize + 1;
+		
+		String kmer;
+		
+		HashSet<Long> validKmers = new HashSet<>(2*numKmers);
+		
+		for (int iter = 0; iter < numKmers; iter++)
+		{
+			kmer = seq.substring(iter, iter + kmerSize);
+			
+			if(!kmer.contains("N"))
+			{
+				HashCode hc = hf.newHasher().putUnencodedChars(kmer).hash();
+				validKmers.add(hc.asLong());
+			}
+		}
+		return validKmers;
 	}
 }

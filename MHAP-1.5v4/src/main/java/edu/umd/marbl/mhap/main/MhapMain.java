@@ -42,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.umd.marbl.mhap.general.FastaData;
+import edu.umd.marbl.mhap.general.FastaDataSofMasking;
 import edu.umd.marbl.mhap.general.Sequence;
 import edu.umd.marbl.mhap.general.SequenceId;
 import edu.umd.marbl.mhap.sketch.CountMin;
@@ -57,6 +58,7 @@ public final class MhapMain
 {
 	private final double acceptScore;
 	private final HashSet<Long> filter;
+	private static HashSet<Long> validKmers;
 	private final String inFile;
 	private final int kmerSize;
 	private final double maxShift;
@@ -110,7 +112,7 @@ public final class MhapMain
 		options.addOption("--max-shift", "[double], region size to the left and right of the estimated overlap, as derived from the median shift and sequence length, where a k-mer matches are still considered valid. Second stage filter only.", DEFAULT_MAX_SHIFT_PERCENT);
 		options.addOption("--num-min-matches", "[int], minimum # min-mer that must be shared before computing second stage filter. Any sequences below that value are considered non-overlapping.", DEFAULT_NUM_MIN_MATCHES);
 		options.addOption("--num-threads", "[int], number of threads to use for computation. Typically set to 2 x #cores.", DEFAULT_NUM_THREADS);
-		options.addOption("--weighted", "Perform weighted MinHashing.", true);
+		options.addOption("--weighted", "Perform weighted MinHashing.", false);
 		options.addOption("--min-store-length", "[int], The minimum length of the read that is stored in the box. Used to filter out short reads from FASTA file.", DEFAULT_MIN_STORE_LENGTH);
 		options.addOption("--no-self", "Do not compute the overlaps between sequences inside a box. Should be used when the to and from sequences are coming from different files.", false);
 		options.addOption("--store-full-id", "Store full IDs as seen in FASTA file, rather than storing just the sequence position in the file. Some FASTA files have long IDS, slowing output of results. IDs not stored in compressed files.", false);
@@ -306,11 +308,14 @@ public final class MhapMain
 			this.kmerCounter = recordFastaKmerCounts(inFile, options.get("--filter-threshold").getDouble());
 		}
 
+		validKmers = recordValidFastaKmers(inFile);
 	}
 	
 	public KmerCounts recordFastaKmerCounts(String file, double filterCutoff) throws IOException
 	{
 		System.err.println("Computing k-mer counts...");
+		
+		System.out.println("Abrindo arquivo " + file);
 		
 		final FastaData data = new FastaData(this.inFile, 0);
 		
@@ -380,6 +385,74 @@ public final class MhapMain
 		System.err.println("Computed k-mer counts for "+counter.get()+" sequences.");
 		
 		return new KmerCounts(countMin, counter.get(), filterCutoff);
+	}
+	
+	//FIXME Carlos
+	public HashSet<Long> recordValidFastaKmers(String file) throws IOException
+	{
+		System.err.println("Computing valid k-mers ...");
+		
+		System.out.println("Abrindo arquivo " + file);
+		
+		final FastaDataSofMasking dataSoftMasked = new FastaDataSofMasking(this.inFile, 0);
+		
+		HashSet<Long> validKmers = new HashSet<Long>();
+		
+		// figure out number of cores
+		ExecutorService execSvc = Executors.newFixedThreadPool(this.numThreads);
+
+		final AtomicInteger counter = new AtomicInteger();
+		for (int iter = 0; iter < this.numThreads; iter++)
+		{
+			Runnable task = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					try
+					{
+						Sequence seq = dataSoftMasked.dequeue();
+						while (seq != null)
+						{
+							//get the valid kmers integers
+							validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
+							
+							//get the valid kmers integers for reverse compliment
+							validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getReverseCompliment().getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
+							
+							int currCount = counter.addAndGet(2);
+							if (currCount % 5000 == 0)
+								System.err.println("Valid kmers stored for " + currCount + " sequences (including reverse compliment)...");
+
+							seq = dataSoftMasked.dequeue();
+						}
+					}
+					catch (IOException e)
+					{
+						throw new MhapRuntimeException(e);
+					}
+				}
+			};
+
+			// enqueue the task
+			execSvc.execute(task);
+		}
+
+		// shutdown the service
+		execSvc.shutdown();
+		try
+		{
+			execSvc.awaitTermination(365L, TimeUnit.DAYS);
+		}
+		catch (InterruptedException e)
+		{
+			execSvc.shutdownNow();
+			throw new MhapRuntimeException("Unable to finish all tasks.");
+		}
+		
+		System.err.println("Computed valid k-mers for "+counter.get()+" sequences.");
+		
+		return validKmers;
 	}
 
 	public void computeMain() throws IOException
@@ -595,5 +668,11 @@ public final class MhapMain
 		System.err.println("Average % of hashed sequences fully compared that are matches: " 
 				+ (double)matchSearch.getMatchesProcessed()/(double)matchSearch.getNumberSequencesFullyCompared()*100.0);
 		System.err.flush();
+	}
+
+
+	public static HashSet<Long> getValidKmers() 
+	{
+		return validKmers;
 	}
 }
