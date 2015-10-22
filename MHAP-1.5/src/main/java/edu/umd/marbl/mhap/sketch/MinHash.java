@@ -99,25 +99,35 @@ public final class MinHash implements Serializable
 			long key = kmer.getKey();
 			int weight = kmer.getValue().count;
 			
-			if(!validKmers.contains(key))
-				continue;
-			
-			if (kmerCount!=null || filter != null)
-			{				
-				if ((kmerCount!=null && kmerCount.documentFrequencyRatio(key)>kmerCount.getFilterCutoff()) || (filter != null && filter.contains(key)))
-				{
-					//System.err.println("Bad = "+kmerCount.inverseDocumentFrequency(key)+", "+kmerCount.weight(key, weight, maxCount));
-					if (!weighted)
-						weight = 0;
-				}
-				else
-				{
-					if (weighted)
-						weight = weight*3;
-					else
-						weight = 1;
-				}
+//			if(!validKmers.contains(key))  //Bernardo 20out 4PM. Nao alterou nada (8 hits , com - --weighted desligado
+//				continue;
+			if(validKmers.contains(key))
+			{
+			      weight = 1;   
 			}
+			else
+			{
+			      weight = 0;			
+			}
+					
+			
+			
+//			if (kmerCount!=null || filter != null)
+//			{				
+//				if ((kmerCount!=null && kmerCount.documentFrequencyRatio(key)>kmerCount.getFilterCutoff()) || (filter != null && filter.contains(key)))
+//				{
+//					//System.err.println("Bad = "+kmerCount.inverseDocumentFrequency(key)+", "+kmerCount.weight(key, weight, maxCount));
+//					if (!weighted)
+//						weight = 0;
+//				}
+//				else
+//				{
+//					if (weighted)
+//						weight = weight*3;
+//					else
+//						weight = 1;
+//				}
+//			}
 			//System.err.println("Good = "+kmerCount.inverseDocumentFrequency(key)+", "+kmerCount.weight(key, weight, maxCount));
 			//int weight = Math.min(1, (int)Math.round(kmerCount.weight(key, kmer.getValue().count, maxCount)));
 			
