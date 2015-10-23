@@ -123,7 +123,7 @@ public class FastaData implements Cloneable
 		}
 	}
 
-	private boolean enqueueNextSequenceInFile() throws IOException
+	protected boolean enqueueNextSequenceInFile() throws IOException
 	{
 		synchronized (this.fileReader)
 		{

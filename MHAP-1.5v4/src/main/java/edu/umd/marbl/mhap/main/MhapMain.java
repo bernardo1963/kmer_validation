@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.umd.marbl.mhap.general.FastaData;
-import edu.umd.marbl.mhap.general.FastaDataSofMasking;
+import edu.umd.marbl.mhap.general.FastaDataSoftMasking;
 import edu.umd.marbl.mhap.general.Sequence;
 import edu.umd.marbl.mhap.general.SequenceId;
 import edu.umd.marbl.mhap.sketch.CountMin;
@@ -309,6 +309,7 @@ public final class MhapMain
 		}
 
 		validKmers = recordValidFastaKmers(inFile);
+		validKmers.addAll(recordValidFastaKmers(toFile));
 	}
 	
 	public KmerCounts recordFastaKmerCounts(String file, double filterCutoff) throws IOException
@@ -394,7 +395,7 @@ public final class MhapMain
 		
 		System.out.println("Abrindo arquivo " + file);
 		
-		final FastaDataSofMasking dataSoftMasked = new FastaDataSofMasking(this.inFile, 0);
+		final FastaDataSoftMasking dataSoftMasked = new FastaDataSoftMasking(this.inFile, 0);
 		
 		HashSet<Long> validKmers = new HashSet<Long>();
 		
