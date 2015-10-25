@@ -402,6 +402,8 @@ public final class MhapMain
 		// figure out number of cores
 		ExecutorService execSvc = Executors.newFixedThreadPool(this.numThreads);
 
+		System.err.println("Starting computation for valid hashes.");
+		
 		final AtomicInteger counter = new AtomicInteger();
 		for (int iter = 0; iter < this.numThreads; iter++)
 		{
@@ -412,12 +414,18 @@ public final class MhapMain
 				{
 					try
 					{
-						Sequence seq = dataSoftMasked.dequeue();
+						Sequence seq;
+						synchronized(dataSoftMasked)
+						{
+							seq = dataSoftMasked.dequeue();
+						}
 						while (seq != null)
 						{
+							//System.err.println("Computing filtered hash for sequence");
 							//get the valid kmers integers
 							validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
 							
+							//System.err.println("Computing filtered hash for sequence reversed");
 							//get the valid kmers integers for reverse compliment
 							validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getReverseCompliment().getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
 							
