@@ -316,7 +316,7 @@ public final class MhapMain
 	{
 		System.err.println("Computing k-mer counts...");
 		
-		System.out.println("Abrindo arquivo " + file);
+		System.err.println("Opening file " + file);
 		
 		final FastaData data = new FastaData(this.inFile, 0);
 		
@@ -393,7 +393,7 @@ public final class MhapMain
 	{
 		System.err.println("Computing valid k-mers ...");
 		
-		System.out.println("Abrindo arquivo " + file);
+		System.err.println("Opening file " + file);
 		
 		final FastaDataSoftMasking dataSoftMasked = new FastaDataSoftMasking(this.inFile, 0);
 		
