@@ -414,21 +414,20 @@ public final class MhapMain
 				{
 					try
 					{
-						Sequence seq;
-						synchronized(dataSoftMasked)
-						{
-							seq = dataSoftMasked.dequeue();
-						}
+						Sequence seq = dataSoftMasked.dequeue();
+
 						while (seq != null)
 						{
-							//System.err.println("Computing filtered hash for sequence");
-							//get the valid kmers integers
-							validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
-							
-							//System.err.println("Computing filtered hash for sequence reversed");
-							//get the valid kmers integers for reverse compliment
-							validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getReverseCompliment().getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
-							
+							synchronized (validKmers) 
+							{
+								//System.err.println("Computing filtered hash for sequence");
+								//get the valid kmers integers
+								validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
+								
+								//System.err.println("Computing filtered hash for sequence reversed");
+								//get the valid kmers integers for reverse compliment
+								validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getReverseCompliment().getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
+							}
 							int currCount = counter.addAndGet(2);
 							if (currCount % 5000 == 0)
 								System.err.println("Valid kmers stored for " + currCount + " sequences (including reverse compliment)...");
