@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -434,6 +435,47 @@ public final class Utils
 			}
 			return new HashSet<Long>(filterArray);
 		}
+	}
+	
+	public static HashSet<Long> createValidKmerFilter(String validKmersFile, int kmerSize, int i) throws FileNotFoundException, IOException 
+	{
+		File file = new File(validKmersFile);
+		
+		String kmer, kmer_rc;
+		int seed = 0;
+		long[] kmerHashes;
+		
+		HashSet<Long> validkmersHashes = new HashSet<Long>();
+		
+		try (BufferedReader bf = new BufferedReader(new FileReader(file), BUFFER_BYTE_SIZE);)
+		{
+			String line = bf.readLine();
+			while (line != null)
+			{
+				String[] str = line.split("\\s+");
+				if(str.length > 2 )
+				{
+					throw new MhapRuntimeException("Valid kmer file must have at most two columns [kmer kmer_percent].");
+				}
+				kmer = str[0];
+				kmerHashes = Utils.computeSequenceHashesLong(kmer, kmerSize, seed);
+				for(long hash : kmerHashes)
+				{
+					validkmersHashes.add(hash);
+				}
+				
+				kmer_rc = Utils.rc(kmer);
+				kmerHashes = Utils.computeSequenceHashesLong(kmer_rc, kmerSize, seed);
+				for(long hash : kmerHashes)
+				{
+					validkmersHashes.add(hash);
+				}
+				
+				line = bf.readLine();
+			}
+		}
+		
+		return validkmersHashes;
 	}
 
 	public final static int[] errorString(int[] s, double readError)

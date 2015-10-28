@@ -57,6 +57,7 @@ public final class MhapMain
 {
 	private final double acceptScore;
 	private final HashSet<Long> filter;
+	private static HashSet<Long> validKmers;
 	private final String inFile;
 	private final int kmerSize;
 	private final double maxShift;
@@ -69,6 +70,7 @@ public final class MhapMain
 	private final int subSequenceSize;	
 	private final String toFile;
 	private final boolean weighted;
+	private final String validKmersFile;
 	
 	private final KmerCounts kmerCounter;
 
@@ -117,6 +119,7 @@ public final class MhapMain
 		options.addOption("--pacbio_fast", "Set all the parameters for the PacBio fast setting. This is the current best guidance, and could change at any time without warning.", false);
 		options.addOption("--pacbio_sensitive", "Set all the parameters for the PacBio sensitive settings. This is the current best guidance, and could change at any time without warning.", false);
 		options.addOption("--pacbio_experimental", "Set all the parameters for the PacBio experimental settings. This is the current best guidance, and could change at any time without warning.", false);
+		options.addOption("--valid-kmers", "File of valid kmers to be used as filter for the hashes", "");
 		
 		if (!options.process(args))
 			System.exit(0);
@@ -200,6 +203,13 @@ public final class MhapMain
 			System.exit(1);
 		}
 		
+		//check for file existance
+		if (!options.get("--valid-kmers").getString().isEmpty() && !new File(options.get("--valid-kmers").getString()).exists())
+		{
+			System.out.println("Could not find requested file/folder: "+options.get("--valid-kmers").getString());
+			System.exit(1);
+		}
+		
 		//check range
 		if (options.get("--num-threads").getInteger()<=0)
 		{
@@ -280,10 +290,32 @@ public final class MhapMain
 		this.maxShift = options.get("--max-shift").getDouble();
 		this.acceptScore = options.get("--threshold").getDouble();
 		this.weighted = options.get("--weighted").getBoolean();
-	
+		
+		this.validKmersFile = options.get("--valid-kmers").getString();
+
+		// read in the valid kmer set
+		if(!this.validKmersFile.isEmpty())
+		{
+			long startTime = System.nanoTime();
+			System.err.println("Reading in filter file " + this.validKmersFile + ".");
+			try
+			{
+				validKmers = Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
+			}
+			catch (Exception e)
+			{
+				throw new MhapRuntimeException("Could not parse k-mer filter file.", e);
+			}
+			System.err.println("Time (s) to read filter file: " + (System.nanoTime() - startTime) * 1.0e-9);
+		}
+		else
+		{
+			validKmers = null;
+		}
+		
 		// read in the kmer filter set
 		String filterFile = options.get("-f").getString();
-		
+
 		if (!filterFile.isEmpty())
 		{
 			long startTime = System.nanoTime();
@@ -595,5 +627,10 @@ public final class MhapMain
 		System.err.println("Average % of hashed sequences fully compared that are matches: " 
 				+ (double)matchSearch.getMatchesProcessed()/(double)matchSearch.getNumberSequencesFullyCompared()*100.0);
 		System.err.flush();
+	}
+
+
+	public static HashSet<Long> getValidKmers() {
+		return validKmers;
 	}
 }
