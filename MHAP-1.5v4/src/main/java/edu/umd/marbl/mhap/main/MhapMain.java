@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.umd.marbl.mhap.general.FastaData;
-import edu.umd.marbl.mhap.general.FastaDataSofMasking;
+import edu.umd.marbl.mhap.general.FastaDataSoftMasking;
 import edu.umd.marbl.mhap.general.Sequence;
 import edu.umd.marbl.mhap.general.SequenceId;
 import edu.umd.marbl.mhap.sketch.CountMin;
@@ -309,13 +309,14 @@ public final class MhapMain
 		}
 
 		validKmers = recordValidFastaKmers(inFile);
+		validKmers.addAll(recordValidFastaKmers(toFile));
 	}
 	
 	public KmerCounts recordFastaKmerCounts(String file, double filterCutoff) throws IOException
 	{
 		System.err.println("Computing k-mer counts...");
 		
-		System.out.println("Abrindo arquivo " + file);
+		System.err.println("Opening file " + file);
 		
 		final FastaData data = new FastaData(this.inFile, 0);
 		
@@ -392,15 +393,17 @@ public final class MhapMain
 	{
 		System.err.println("Computing valid k-mers ...");
 		
-		System.out.println("Abrindo arquivo " + file);
+		System.err.println("Opening file " + file);
 		
-		final FastaDataSofMasking dataSoftMasked = new FastaDataSofMasking(this.inFile, 0);
+		final FastaDataSoftMasking dataSoftMasked = new FastaDataSoftMasking(this.inFile, 0);
 		
 		HashSet<Long> validKmers = new HashSet<Long>();
 		
 		// figure out number of cores
 		ExecutorService execSvc = Executors.newFixedThreadPool(this.numThreads);
 
+		System.err.println("Starting computation for valid hashes.");
+		
 		final AtomicInteger counter = new AtomicInteger();
 		for (int iter = 0; iter < this.numThreads; iter++)
 		{
@@ -412,14 +415,19 @@ public final class MhapMain
 					try
 					{
 						Sequence seq = dataSoftMasked.dequeue();
+
 						while (seq != null)
 						{
-							//get the valid kmers integers
-							validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
-							
-							//get the valid kmers integers for reverse compliment
-							validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getReverseCompliment().getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
-							
+							synchronized (validKmers) 
+							{
+								//System.err.println("Computing filtered hash for sequence");
+								//get the valid kmers integers
+								validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
+								
+								//System.err.println("Computing filtered hash for sequence reversed");
+								//get the valid kmers integers for reverse compliment
+								validKmers.addAll(Utils.computeSequenceHashesLongSMFiltered(seq.getReverseCompliment().getString().replaceAll("[atgcn]", "N"), MhapMain.this.kmerSize, 0));
+							}
 							int currCount = counter.addAndGet(2);
 							if (currCount % 5000 == 0)
 								System.err.println("Valid kmers stored for " + currCount + " sequences (including reverse compliment)...");

@@ -887,7 +887,7 @@ public final class Utils
 		
 		String kmer;
 		
-		HashSet<Long> validKmers = new HashSet<>(2*numKmers);
+		HashSet<Long> validKmers = new HashSet<>();
 		
 		for (int iter = 0; iter < numKmers; iter++)
 		{

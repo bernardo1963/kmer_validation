@@ -4,14 +4,15 @@ import java.io.IOException;
 
 import edu.umd.marbl.mhap.utils.MhapRuntimeException;
 
-public class FastaDataSofMasking extends FastaData 
+public class FastaDataSoftMasking extends FastaData 
 {
-	public FastaDataSofMasking(String file, int offset) throws IOException 
+	public FastaDataSoftMasking(String file, int offset) throws IOException 
 	{
 		super(file, offset);
 	}
 	
-	private boolean enqueueNextSequenceInFile() throws IOException
+	@Override
+	protected boolean enqueueNextSequenceInFile() throws IOException
 	{
 		synchronized (this.fileReader)
 		{
