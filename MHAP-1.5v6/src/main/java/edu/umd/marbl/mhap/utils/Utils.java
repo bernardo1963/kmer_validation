@@ -35,6 +35,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
+
+import org.apache.lucene.util.OpenBitSet;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.BufferedReader;
@@ -446,6 +449,8 @@ public final class Utils
 		long[] kmerHashes;
 		
 		HashSet<Long> validkmersHashes = new HashSet<Long>();
+		
+		//OpenBitSet validkmersHashes = new OpenBitSet();
 		
 		try (BufferedReader bf = new BufferedReader(new FileReader(file), BUFFER_BYTE_SIZE);)
 		{

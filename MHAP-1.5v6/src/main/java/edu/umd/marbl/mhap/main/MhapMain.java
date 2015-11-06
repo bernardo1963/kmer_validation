@@ -300,6 +300,7 @@ public final class MhapMain
 			System.err.println("Reading in filter file " + this.validKmersFile + ".");
 			try
 			{
+				
 				validKmers = Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
 			}
 			catch (Exception e)
