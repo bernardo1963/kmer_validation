@@ -440,7 +440,7 @@ public final class Utils
 		}
 	}
 	
-	public static HashSet<Long> createValidKmerFilter(String validKmersFile, int kmerSize, int i) throws FileNotFoundException, IOException 
+	public static OpenBitSet createValidKmerFilter(String validKmersFile, int kmerSize, int i) throws FileNotFoundException, IOException 
 	{
 		File file = new File(validKmersFile);
 		
@@ -448,7 +448,7 @@ public final class Utils
 		int seed = 0;
 		long[] kmerHashes;
 		
-		HashSet<Long> validkmersHashes = new HashSet<Long>();
+		OpenBitSet validkmersHashes = new OpenBitSet();
 		
 		//OpenBitSet validkmersHashes = new OpenBitSet();
 		
@@ -466,14 +466,18 @@ public final class Utils
 				kmerHashes = Utils.computeSequenceHashesLong(kmer, kmerSize, seed);
 				for(long hash : kmerHashes)
 				{
-					validkmersHashes.add(hash);
+					//validkmersHashes.add(hash);
+					if(hash >= 0)
+						validkmersHashes.set(hash);
 				}
 				
 				kmer_rc = Utils.rc(kmer);
 				kmerHashes = Utils.computeSequenceHashesLong(kmer_rc, kmerSize, seed);
 				for(long hash : kmerHashes)
 				{
-					validkmersHashes.add(hash);
+					//validkmersHashes.add(hash);
+					if(hash >= 0)
+						validkmersHashes.set(hash);
 				}
 				
 				line = bf.readLine();

@@ -41,6 +41,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.lucene.util.OpenBitSet;
+
 import edu.umd.marbl.mhap.general.FastaData;
 import edu.umd.marbl.mhap.general.Sequence;
 import edu.umd.marbl.mhap.general.SequenceId;
@@ -57,7 +59,7 @@ public final class MhapMain
 {
 	private final double acceptScore;
 	private final HashSet<Long> filter;
-	private static HashSet<Long> validKmers;
+	private static OpenBitSet validKmers;
 	private final String inFile;
 	private final int kmerSize;
 	private final double maxShift;
@@ -300,7 +302,6 @@ public final class MhapMain
 			System.err.println("Reading in filter file " + this.validKmersFile + ".");
 			try
 			{
-				
 				validKmers = Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
 			}
 			catch (Exception e)
@@ -631,7 +632,8 @@ public final class MhapMain
 	}
 
 
-	public static HashSet<Long> getValidKmers() {
+	public static OpenBitSet getValidKmers() 
+	{
 		return validKmers;
 	}
 }
