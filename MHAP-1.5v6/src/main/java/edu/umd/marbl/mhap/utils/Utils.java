@@ -403,9 +403,6 @@ public final class Utils
 			throws IOException
 	{
 		File file = new File(fileName);
-		
-		validPositiveKmerHashes = new OpenBitSet();
-		validNegativeKmerHashes = new OpenBitSet();
 
 		// make sure don't leak resources
 		try (BufferedReader bf = new BufferedReader(new FileReader(file), BUFFER_BYTE_SIZE);)
@@ -448,6 +445,9 @@ public final class Utils
 	public static void createValidKmerFilter(String validKmersFile, int kmerSize, int i) throws FileNotFoundException, IOException 
 	{
 		File file = new File(validKmersFile);
+		
+		validPositiveKmerHashes = new OpenBitSet();
+		validNegativeKmerHashes = new OpenBitSet();
 		
 		String kmer, kmer_rc;
 		int seed = 0;
