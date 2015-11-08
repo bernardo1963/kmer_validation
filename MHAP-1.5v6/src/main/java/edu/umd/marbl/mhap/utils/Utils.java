@@ -403,6 +403,9 @@ public final class Utils
 			throws IOException
 	{
 		File file = new File(fileName);
+		
+		validPositiveKmerHashes = new OpenBitSet();
+		validNegativeKmerHashes = new OpenBitSet();
 
 		// make sure don't leak resources
 		try (BufferedReader bf = new BufferedReader(new FileReader(file), BUFFER_BYTE_SIZE);)
