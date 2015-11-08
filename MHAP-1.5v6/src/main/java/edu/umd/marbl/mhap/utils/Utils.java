@@ -53,6 +53,8 @@ import com.google.common.hash.Hashing;
 
 public final class Utils
 {
+	private static OpenBitSet validPositiveKmerHashes;
+	private static OpenBitSet validNegativeKmerHashes;
 
 	public enum ToProtein
 	{
@@ -440,17 +442,13 @@ public final class Utils
 		}
 	}
 	
-	public static OpenBitSet createValidKmerFilter(String validKmersFile, int kmerSize, int i) throws FileNotFoundException, IOException 
+	public static void createValidKmerFilter(String validKmersFile, int kmerSize, int i) throws FileNotFoundException, IOException 
 	{
 		File file = new File(validKmersFile);
 		
 		String kmer, kmer_rc;
 		int seed = 0;
 		long[] kmerHashes;
-		
-		OpenBitSet validkmersHashes = new OpenBitSet();
-		
-		//OpenBitSet validkmersHashes = new OpenBitSet();
 		
 		try (BufferedReader bf = new BufferedReader(new FileReader(file), BUFFER_BYTE_SIZE);)
 		{
@@ -466,25 +464,25 @@ public final class Utils
 				kmerHashes = Utils.computeSequenceHashesLong(kmer, kmerSize, seed);
 				for(long hash : kmerHashes)
 				{
-					//validkmersHashes.add(hash);
 					if(hash >= 0)
-						validkmersHashes.set(hash);
+						validPositiveKmerHashes.set(hash);
+					else
+						validNegativeKmerHashes.set(hash * (-1));
 				}
 				
 				kmer_rc = Utils.rc(kmer);
 				kmerHashes = Utils.computeSequenceHashesLong(kmer_rc, kmerSize, seed);
 				for(long hash : kmerHashes)
 				{
-					//validkmersHashes.add(hash);
 					if(hash >= 0)
-						validkmersHashes.set(hash);
+						validPositiveKmerHashes.set(hash);
+					else
+						validNegativeKmerHashes.set(hash * (-1));
 				}
 				
 				line = bf.readLine();
 			}
 		}
-		
-		return validkmersHashes;
 	}
 
 	public final static int[] errorString(int[] s, double readError)
@@ -924,5 +922,15 @@ public final class Utils
 		s.append("]");
 
 		return new String(s);
+	}
+
+	public static OpenBitSet getValidPositiveKmerHashes() 
+	{
+		return validPositiveKmerHashes;
+	}
+
+	public static OpenBitSet getValidNegativeKmerHashes() 
+	{
+		return validNegativeKmerHashes;
 	}
 }

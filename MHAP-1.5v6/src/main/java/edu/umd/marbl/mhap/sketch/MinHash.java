@@ -116,7 +116,8 @@ public final class MinHash implements Serializable
 			//System.err.println("Good = "+kmerCount.inverseDocumentFrequency(key)+", "+kmerCount.weight(key, weight, maxCount));
 			//int weight = Math.min(1, (int)Math.round(kmerCount.weight(key, kmer.getValue().count, maxCount)));
 			
-			if((MhapMain.getValidKmers() != null) && (!MhapMain.getValidKmers().get(key)))
+			if(((MhapMain.getValidPositiveKmers() != null) || MhapMain.getValidNegativeKmers() != null) && 
+					(!MhapMain.getValidPositiveKmers().get(key) || !MhapMain.getValidNegativeKmers().get(key)))
 			{
 				weight = 0;
 			}
