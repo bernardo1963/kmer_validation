@@ -67,7 +67,7 @@ public final class MinHash implements Serializable
 			throw new MhapRuntimeException("Kmer size bigger than string length.");
 	
 		// get the kmer hashes
-		final long[] kmerHashes = Utils.computeSequenceHashesLong(seq, kmerSize, 0);
+		final long[] kmerHashes = Utils.computeHashYGSToArray(seq, kmerSize);
 		
 		//now compute the counts of occurance
 		HashMap<Long, HitCounter> hitMap = new LinkedHashMap<>(kmerHashes.length);
@@ -115,9 +115,8 @@ public final class MinHash implements Serializable
 			}
 			//System.err.println("Good = "+kmerCount.inverseDocumentFrequency(key)+", "+kmerCount.weight(key, weight, maxCount));
 			//int weight = Math.min(1, (int)Math.round(kmerCount.weight(key, kmer.getValue().count, maxCount)));
-			
-			if(((MhapMain.getValidPositiveKmers() != null) || MhapMain.getValidNegativeKmers() != null) && 
-					(!MhapMain.getValidPositiveKmers().get(key) || !MhapMain.getValidNegativeKmers().get(key)))
+			System.out.println("key = " + key);
+			if(((MhapMain.getValidKmersHashes() != null) && (!MhapMain.getValidKmersHashes().get(key))))
 			{
 				weight = 0;
 			}

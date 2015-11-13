@@ -59,8 +59,7 @@ public final class MhapMain
 {
 	private final double acceptScore;
 	private final HashSet<Long> filter;
-	private static OpenBitSet validPositiveKmers;
-	private static OpenBitSet validNegativeKmers;
+	private static OpenBitSet validKmersHashes;
 	private final String inFile;
 	private final int kmerSize;
 	private final double maxShift;
@@ -304,8 +303,7 @@ public final class MhapMain
 			try
 			{
 				Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
-				validPositiveKmers = Utils.getValidPositiveKmerHashes();
-				validNegativeKmers = Utils.getValidNegativeKmerHashes();
+				validKmersHashes = Utils.getValidKmerHashes();
 			}
 			catch (Exception e)
 			{
@@ -315,8 +313,7 @@ public final class MhapMain
 		}
 		else
 		{
-			validPositiveKmers = null;
-			validNegativeKmers = null;
+			validKmersHashes = null;
 		}
 		
 		// read in the kmer filter set
@@ -636,13 +633,8 @@ public final class MhapMain
 	}
 
 
-	public static OpenBitSet getValidPositiveKmers() 
+	public static OpenBitSet getValidKmersHashes() 
 	{
-		return validPositiveKmers;
-	}
-	
-	public static OpenBitSet getValidNegativeKmers() 
-	{
-		return validNegativeKmers;
+		return validKmersHashes;
 	}
 }

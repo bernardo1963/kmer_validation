@@ -53,8 +53,7 @@ import com.google.common.hash.Hashing;
 
 public final class Utils
 {
-	private static OpenBitSet validPositiveKmerHashes;
-	private static OpenBitSet validNegativeKmerHashes;
+	private static OpenBitSet validKmerHashes;
 
 	public enum ToProtein
 	{
@@ -446,12 +445,11 @@ public final class Utils
 	{
 		File file = new File(validKmersFile);
 		
-		validPositiveKmerHashes = new OpenBitSet();
-		validNegativeKmerHashes = new OpenBitSet();
+		validKmerHashes = new OpenBitSet(((Integer.MAX_VALUE + 1)*2)-1);
 		
 		String kmer, kmer_rc;
 		int seed = 0;
-		long[] kmerHashes;
+		long kmerHash;
 		
 		try (BufferedReader bf = new BufferedReader(new FileReader(file), BUFFER_BYTE_SIZE);)
 		{
@@ -464,28 +462,50 @@ public final class Utils
 					throw new MhapRuntimeException("Valid kmer file must have at most two columns [kmer kmer_percent].");
 				}
 				kmer = str[0];
-				kmerHashes = Utils.computeSequenceHashesLong(kmer, kmerSize, seed);
-				for(long hash : kmerHashes)
-				{
-					if(hash >= 0)
-						validPositiveKmerHashes.set(hash);
-					else
-						validNegativeKmerHashes.set(hash * (-1));
-				}
+				kmerHash = Utils.computeHashYGS(kmer);
+				validKmerHashes.set(kmerHash);
 				
 				kmer_rc = Utils.rc(kmer);
-				kmerHashes = Utils.computeSequenceHashesLong(kmer_rc, kmerSize, seed);
-				for(long hash : kmerHashes)
-				{
-					if(hash >= 0)
-						validPositiveKmerHashes.set(hash);
-					else
-						validNegativeKmerHashes.set(hash * (-1));
-				}
+				kmerHash = Utils.computeHashYGS(kmer_rc);
+				validKmerHashes.set(kmerHash);
 				
 				line = bf.readLine();
 			}
 		}
+	}
+
+	private static long computeHashYGS(String kmer) 
+	{
+		String kmerBinary;
+		
+		kmerBinary = kmer.replaceAll("A", "00");
+		kmerBinary = kmerBinary.replaceAll("C", "01");
+		kmerBinary = kmerBinary.replaceAll("G", "10");
+		kmerBinary = kmerBinary.replaceAll("T", "11");
+		
+		long val = Long.parseLong(kmerBinary, 2); 
+		//System.out.println(kmer + ", " + kmerBinary + ", " + val);
+		return val;
+	}
+	
+	public static long[] computeHashYGSToArray(String seq, int kmerSize) 
+	{
+		//HashFunction hf = Hashing.murmur3_128(seed);
+		String subKmer;
+		long[] hashes = new long[seq.length() - kmerSize + 1];
+		for (int iter = 0; iter < hashes.length; iter++)
+		{
+			//HashCode hc = hf.newHasher().putUnencodedChars(seq.substring(iter, iter + kmerSize)).hash();
+			//hashes[iter] = hc.asLong();
+			subKmer = seq.substring(iter, iter+kmerSize);
+			
+			if(!subKmer.contains("N"))
+			{
+				hashes[iter] = computeHashYGS(subKmer);
+			}
+		}
+
+		return hashes;
 	}
 
 	public final static int[] errorString(int[] s, double readError)
@@ -927,13 +947,8 @@ public final class Utils
 		return new String(s);
 	}
 
-	public static OpenBitSet getValidPositiveKmerHashes() 
+	public static OpenBitSet getValidKmerHashes() 
 	{
-		return validPositiveKmerHashes;
-	}
-
-	public static OpenBitSet getValidNegativeKmerHashes() 
-	{
-		return validNegativeKmerHashes;
+		return validKmerHashes;
 	}
 }
