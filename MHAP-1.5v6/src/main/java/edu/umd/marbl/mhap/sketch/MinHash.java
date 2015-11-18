@@ -42,9 +42,9 @@ import java.util.Map.Entry;
 
 import edu.umd.marbl.mhap.general.Sequence;
 import edu.umd.marbl.mhap.main.MhapMain;
-import edu.umd.marbl.mhap.utils.MhapRuntimeException;
 import edu.umd.marbl.mhap.utils.HitCounter;
 import edu.umd.marbl.mhap.utils.MersenneTwisterFast;
+import edu.umd.marbl.mhap.utils.MhapRuntimeException;
 import edu.umd.marbl.mhap.utils.Utils;
 
 public final class MinHash implements Serializable
@@ -67,7 +67,11 @@ public final class MinHash implements Serializable
 			throw new MhapRuntimeException("Kmer size bigger than string length.");
 	
 		// get the kmer hashes
-		final long[] kmerHashes = Utils.computeHashYGSToArray(seq, kmerSize);
+		final long[] kmerHashes;
+		if(MhapMain.getValidKmersHashes() != null)
+			kmerHashes = Utils.computeSequenceHashesLongValidKmers(seq, kmerSize, 0);
+		else
+			kmerHashes = Utils.computeSequenceHashesLong(seq, kmerSize, 0);
 		
 		//now compute the counts of occurance
 		HashMap<Long, HitCounter> hitMap = new LinkedHashMap<>(kmerHashes.length);
@@ -115,14 +119,15 @@ public final class MinHash implements Serializable
 			}
 			//System.err.println("Good = "+kmerCount.inverseDocumentFrequency(key)+", "+kmerCount.weight(key, weight, maxCount));
 			//int weight = Math.min(1, (int)Math.round(kmerCount.weight(key, kmer.getValue().count, maxCount)));
-			System.out.println("key = " + key);
-			if(((MhapMain.getValidKmersHashes() != null) && (!MhapMain.getValidKmersHashes().get(key))))
+			//System.out.println("key = " + key);
+			//Bernardo
+			if((MhapMain.getValidKmersHashes() != null) && (key==Long.MAX_VALUE) )
 			{
 				weight = 0;
 			}
 			if (weight<=0)
 				continue;
-		
+
 			long x = key;
 			
 			for (int word = 0; word < numHashes; word++)

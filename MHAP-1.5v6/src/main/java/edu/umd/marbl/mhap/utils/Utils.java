@@ -29,6 +29,13 @@
  */
 package edu.umd.marbl.mhap.utils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -38,18 +45,12 @@ import java.util.Random;
 
 import org.apache.lucene.util.OpenBitSet;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.FileReader;
-import java.nio.ByteBuffer;
-
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
+
+import edu.umd.marbl.mhap.main.MhapMain;
 
 public final class Utils
 {
@@ -314,6 +315,33 @@ public final class Utils
 		return hashes;
 	}
 	
+	public final static long[] computeSequenceHashesLongValidKmers(final String seq, final int kmerSize, final int seed)
+	{
+		HashFunction hf = Hashing.murmur3_128(seed);
+
+		long[] hashes = new long[seq.length() - kmerSize + 1];
+		for (int iter = 0; iter < hashes.length; iter++)
+		{
+			String subSeq = seq.substring(iter, iter + kmerSize);
+			long hashYGS;
+			
+			hashes[iter] = Long.MAX_VALUE;
+			
+			if (!subSeq.contains("N"))
+			{
+				hashYGS = computeHashYGS(subSeq);
+				
+				if(MhapMain.getValidKmersHashes().get(hashYGS))
+				{
+					HashCode hc = hf.newHasher().putUnencodedChars(subSeq).hash();
+					hashes[iter] = hc.asLong();
+				}
+			}
+		}
+
+		return hashes;
+	}
+	
 	public final static long[] computeSequenceHashesLong(final String seq, final int kmerSize, final int seed)
 	{
 		HashFunction hf = Hashing.murmur3_128(seed);
@@ -477,7 +505,6 @@ public final class Utils
 	private static long computeHashYGS(String kmer) 
 	{
 		String kmerBinary;
-		
 		kmerBinary = kmer.replaceAll("A", "00");
 		kmerBinary = kmerBinary.replaceAll("C", "01");
 		kmerBinary = kmerBinary.replaceAll("G", "10");
@@ -502,6 +529,9 @@ public final class Utils
 			if(!subKmer.contains("N"))
 			{
 				hashes[iter] = computeHashYGS(subKmer);
+			}else
+			{
+				hashes[iter] = Integer.MAX_VALUE;
 			}
 		}
 
