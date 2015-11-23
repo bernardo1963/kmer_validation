@@ -479,12 +479,15 @@ public final class Utils
 		int seed = 0;
 		long kmerHash;
 		
+		checkValidKmersFile(file, kmerSize);
+		
 		try (BufferedReader bf = new BufferedReader(new FileReader(file), BUFFER_BYTE_SIZE);)
 		{
 			String line = bf.readLine();
+			
 			while (line != null)
 			{
-				String[] str = line.split("\\s+");
+				/*String[] str = line.split("\\s+");
 				if(str.length > 2 )
 				{
 					throw new MhapRuntimeException("Valid kmer file must have at most two columns [kmer kmer_percent].");
@@ -496,10 +499,47 @@ public final class Utils
 				kmer_rc = Utils.rc(kmer);
 				kmerHash = Utils.computeHashYGS(kmer_rc);
 				validKmerHashes.set(kmerHash);
+				*/
+				kmerHash = Utils.computeHashYGS(line);
+				validKmerHashes.set(kmerHash);
+				
+				kmer_rc = Utils.rc(line);
+				kmerHash = Utils.computeHashYGS(kmer_rc);
+				validKmerHashes.set(kmerHash);
 				
 				line = bf.readLine();
 			}
 		}
+	}
+
+	private static void checkValidKmersFile(File file, int kmerSize) throws FileNotFoundException, IOException 
+	{
+		try(BufferedReader bf = new BufferedReader(new FileReader(file));)
+		{
+			String line = bf.readLine();
+			int counter = 1;
+			while(line != null && counter <= 100)
+			{
+				String[] str = line.split("\\s+");
+				if(str.length > 1 )
+				{
+					throw new MhapRuntimeException("Valid kmer file must have at most one column [kmer]. Offending line: " + counter + ". With text: " + line);
+				}
+				
+				if(line.length() != kmerSize)
+				{
+					throw new MhapRuntimeException("Kmers of valid kmers file have " + line.length() + ", but the expected was " + kmerSize + "Offending line: " + counter + ". With text: " + line);
+				}
+				
+				if(line.matches("[^ATGCatgc]"))
+				{
+					throw new MhapRuntimeException("non ATGC character found at valid kmers file. Offending line: " + counter + ". With text: " + line);
+				}
+				
+				counter++;
+			}
+		}
+		
 	}
 
 	private static long computeHashYGS(String kmer) 
