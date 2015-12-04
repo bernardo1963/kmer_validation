@@ -331,7 +331,8 @@ public final class Utils
 			{
 				hashYGS = computeHashYGS(subSeq);
 				
-				if(MhapMain.getValidKmersHashes().get(hashYGS))
+				//if(MhapMain.getValidKmersHashes().get(hashYGS)) //Bernardo
+				if(MhapMain.getValidKmersHashes().fastGet(hashYGS)) 
 				{
 					HashCode hc = hf.newHasher().putUnencodedChars(subSeq).hash();
 					hashes[iter] = hc.asLong();
@@ -473,7 +474,15 @@ public final class Utils
 	{
 		File file = new File(validKmersFile);
 		
-		validKmerHashes = new OpenBitSet(((Integer.MAX_VALUE + 1)*2)-1);
+		/*
+		  java  Integer.MAX_VALUE = 2,147,483,647
+			BitSet  must accommodate 16 T: 
+			TTTTTTTTTTTTTTTT = binary 11111111111111111111111111111111 = decimal 4,294,967,295 = 2* Integer.MAX_VALUE  + 1
+		 */
+		
+		//validKmerHashes = new OpenBitSet(((Integer.MAX_VALUE + 1)*2)-1);
+		long numBits = 2*(long)Integer.MAX_VALUE  + 1; 
+		validKmerHashes = new OpenBitSet(numBits);
 		
 		String kmer, kmer_rc;
 		int seed = 0;
@@ -501,11 +510,13 @@ public final class Utils
 				validKmerHashes.set(kmerHash);
 				*/
 				kmerHash = Utils.computeHashYGS(line);
-				validKmerHashes.set(kmerHash);
+				//validKmerHashes.set(kmerHash);  //Bernardo
+				validKmerHashes.fastSet(kmerHash);
 				
 				kmer_rc = Utils.rc(line);
 				kmerHash = Utils.computeHashYGS(kmer_rc);
-				validKmerHashes.set(kmerHash);
+				//validKmerHashes.set(kmerHash);  //Bernardo
+				validKmerHashes.fastSet(kmerHash);
 				
 				line = bf.readLine();
 			}

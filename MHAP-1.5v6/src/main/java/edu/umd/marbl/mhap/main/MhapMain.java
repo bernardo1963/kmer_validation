@@ -295,11 +295,11 @@ public final class MhapMain
 		
 		this.validKmersFile = options.get("--valid-kmers").getString();
 
-		// read in the valid kmer set
+		// read in the valid kmer set (will be included)
 		if(!this.validKmersFile.isEmpty())
 		{
 			long startTime = System.nanoTime();
-			System.err.println("Reading in filter file " + this.validKmersFile + ".");
+			System.err.println("Reading valid kmer file " + this.validKmersFile + ".");
 			try
 			{
 				Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
@@ -307,16 +307,16 @@ public final class MhapMain
 			}
 			catch (Exception e)
 			{
-				throw new MhapRuntimeException("Could not parse k-mer filter file.", e);
+				throw new MhapRuntimeException("Could not parse valid k-mer file.", e);
 			}
-			System.err.println("Time (s) to read filter file: " + (System.nanoTime() - startTime) * 1.0e-9);
+			System.err.println("Time (s) to read valid kmer file: " + (System.nanoTime() - startTime) * 1.0e-9);
 		}
 		else
 		{
 			validKmersHashes = null;
 		}
 		
-		// read in the kmer filter set
+		// read in the kmer filter set (will be excluded)
 		String filterFile = options.get("-f").getString();
 
 		if (!filterFile.isEmpty())
