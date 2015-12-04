@@ -30,8 +30,10 @@
 package edu.umd.marbl.mhap.main;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -294,22 +296,42 @@ public final class MhapMain
 		this.weighted = options.get("--weighted").getBoolean();
 		
 		this.validKmersFile = options.get("--valid-kmers").getString();
-
+		
+		String validBitVectorsName = this.validKmersFile + ".bitvector";
+		File validBitVectors = new File(validBitVectorsName);
+		
 		// read in the valid kmer set (will be included)
 		if(!this.validKmersFile.isEmpty())
 		{
-			long startTime = System.nanoTime();
-			System.err.println("Reading valid kmer file " + this.validKmersFile + ".");
-			try
+			if(!validBitVectors.exists())
 			{
-				Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
-				validKmersHashes = Utils.getValidKmerHashes();
+				long startTime = System.nanoTime();
+				System.err.println("Reading valid kmer file " + this.validKmersFile + ".");
+				try
+				{
+					Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
+					validKmersHashes = Utils.getValidKmerHashes();
+				}
+				catch (Exception e)
+				{
+					throw new MhapRuntimeException("Could not parse valid k-mer file.", e);
+				}
+				System.err.println("Time (s) to read valid kmer file: " + (System.nanoTime() - startTime) * 1.0e-9);
 			}
-			catch (Exception e)
+			else
 			{
-				throw new MhapRuntimeException("Could not parse valid k-mer file.", e);
+				ObjectInputStream inputStream = null;
+				long[] preProcessedValidKmers = null; 
+		        
+				try{
+		            inputStream = new ObjectInputStream(new FileInputStream(validBitVectorsName));
+		            preProcessedValidKmers = (long[])inputStream.readObject();
+		        }catch(Exception e){
+		            System.err.println("There was a problem opening the file: " + e);
+		        } 
+				
+				validKmersHashes = new OpenBitSet(preProcessedValidKmers, preProcessedValidKmers.length);
 			}
-			System.err.println("Time (s) to read valid kmer file: " + (System.nanoTime() - startTime) * 1.0e-9);
 		}
 		else
 		{
