@@ -31,9 +31,11 @@ package edu.umd.marbl.mhap.main;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -311,6 +313,15 @@ public final class MhapMain
 				{
 					Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
 					validKmersHashes = Utils.getValidKmerHashes();
+					
+					ObjectOutputStream outputStream = null;
+					outputStream = new ObjectOutputStream(new FileOutputStream(validBitVectorsName));
+					
+					System.err.println("Creating binary file of valid kmer hashes");
+					
+					outputStream.writeObject(validKmersHashes);
+					
+					outputStream.close();
 				}
 				catch (Exception e)
 				{
@@ -321,16 +332,18 @@ public final class MhapMain
 			else
 			{
 				ObjectInputStream inputStream = null;
-				long[] preProcessedValidKmers = null; 
 		        
-				try{
+				try
+				{
+					System.err.println("Reading binary file of valid kmer hashes");
+					
 		            inputStream = new ObjectInputStream(new FileInputStream(validBitVectorsName));
-		            preProcessedValidKmers = (long[])inputStream.readObject();
+		            validKmersHashes = (OpenBitSet) inputStream.readObject();
+		            
+		            inputStream.close();
 		        }catch(Exception e){
 		            System.err.println("There was a problem opening the file: " + e);
 		        } 
-				
-				validKmersHashes = new OpenBitSet(preProcessedValidKmers, preProcessedValidKmers.length);
 			}
 		}
 		else
