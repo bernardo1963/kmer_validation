@@ -319,7 +319,7 @@ public final class MhapMain
 					
 					System.err.println("Creating binary file of valid kmer hashes");
 					
-					outputStream.writeObject(validKmersHashes);
+					outputStream.writeObject(validKmersHashes.getBits());
 					
 					outputStream.close();
 				}
@@ -338,7 +338,9 @@ public final class MhapMain
 					System.err.println("Reading binary file of valid kmer hashes");
 					
 		            inputStream = new ObjectInputStream(new FileInputStream(validBitVectorsName));
-		            validKmersHashes = (OpenBitSet) inputStream.readObject();
+		            long[] validBitVector = (long[]) inputStream.readObject(); 
+		            
+		            validKmersHashes = new OpenBitSet(validBitVector, validBitVector.length);
 		            
 		            inputStream.close();
 		        }catch(Exception e){
