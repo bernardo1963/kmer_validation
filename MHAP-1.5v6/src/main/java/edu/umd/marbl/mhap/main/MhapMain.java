@@ -31,6 +31,7 @@ package edu.umd.marbl.mhap.main;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -77,6 +78,7 @@ public final class MhapMain
 	private final String toFile;
 	private final boolean weighted;
 	private final String validKmersFile;
+	private static ParseOptions options;
 	
 	private final KmerCounts kmerCounter;
 
@@ -101,7 +103,6 @@ public final class MhapMain
 		// set the locale
 		Locale.setDefault(Locale.US);
 		
-		ParseOptions options = new ParseOptions();
 		options.addStartTextLine("MHAP: MinHash Alignment Protocol. A tool for overlapping long-read sequences in bioinformatics.");
 		options.addStartTextLine("\tVersion: "+PackageInfo.VERSION+", Build time: "+PackageInfo.BUILD_TIME);		
 		options.addStartTextLine("\tUsage 1 (direct execution): java -server -Xmx<memory> -jar <MHAP jar> -s<fasta/dat from/self file> [-q<fasta/dat to file>] [-f<kmer filter list, must be sorted>]");
@@ -278,9 +279,8 @@ public final class MhapMain
 		//execute main computation code
 		main.computeMain();
 	}
-	
 
-	public MhapMain(ParseOptions options) throws IOException 
+	public MhapMain(ParseOptions options) throws Exception 
 	{
 		this.processFile = options.get("-p").getString();
 		this.inFile = options.get("-s").getString();
@@ -305,48 +305,7 @@ public final class MhapMain
 		// read in the valid kmer set (will be included)
 		if(!this.validKmersFile.isEmpty())
 		{
-			if(!validBitVectors.exists())
-			{
-				long startTime = System.nanoTime();
-				System.err.println("Reading valid kmer file " + this.validKmersFile + ".");
-				try
-				{
-					Utils.createValidKmerFilter(this.validKmersFile, this.kmerSize, 0);
-					validKmersHashes = Utils.getValidKmerHashes();
-					
-					ObjectOutputStream outputStream = null;
-					outputStream = new ObjectOutputStream(new FileOutputStream(validBitVectorsName));
-					
-					System.err.println("Creating binary file of valid kmer hashes");
-					
-					outputStream.writeObject(validKmersHashes.getBits());
-					
-					outputStream.close();
-				}
-				catch (Exception e)
-				{
-					throw new MhapRuntimeException("Could not parse valid k-mer file.", e);
-				}
-				System.err.println("Time (s) to read valid kmer file: " + (System.nanoTime() - startTime) * 1.0e-9);
-			}
-			else
-			{
-				ObjectInputStream inputStream = null;
-		        
-				try
-				{
-					System.err.println("Reading binary file of valid kmer hashes");
-					
-		            inputStream = new ObjectInputStream(new FileInputStream(validBitVectorsName));
-		            long[] validBitVector = (long[]) inputStream.readObject(); 
-		            
-		            validKmersHashes = new OpenBitSet(validBitVector, validBitVector.length);
-		            
-		            inputStream.close();
-		        }catch(Exception e){
-		            System.err.println("There was a problem opening the file: " + e);
-		        } 
-			}
+			setupBitVectorsFile(validBitVectorsName, validBitVectors);
 		}
 		else
 		{
@@ -378,6 +337,25 @@ public final class MhapMain
 			this.kmerCounter = recordFastaKmerCounts(inFile, options.get("--filter-threshold").getDouble());
 		}
 
+	}
+
+
+	public void setupBitVectorsFile(String validBitVectorsName, File validBitVectors) throws Exception 
+	{
+		ValidBitVectorsFileBuilder validBitVectorsFileBuilder = new ValidBitVectorsFileBuilder();
+		
+		if(!validBitVectors.exists())
+		{
+			System.err.println("Reading valid kmer file " + validKmersFile + ".");
+			
+			Utils.createValidKmerFilter(validKmersFile, kmerSize, 0);
+			validKmersHashes = Utils.getValidKmerHashes();
+			validBitVectorsFileBuilder.createValidBitVectorsFile(validBitVectorsName, validKmersHashes);
+		}
+		else
+		{
+			validKmersHashes = validBitVectorsFileBuilder.readValidBitVectorsFile(validBitVectorsName); 
+		}
 	}
 	
 	public KmerCounts recordFastaKmerCounts(String file, double filterCutoff) throws IOException
@@ -673,5 +651,13 @@ public final class MhapMain
 	public static OpenBitSet getValidKmersHashes() 
 	{
 		return validKmersHashes;
+	}
+
+	public static ParseOptions getOptions() {
+		return options;
+	}
+
+	public static void setOptions(ParseOptions options) {
+		MhapMain.options = options;
 	}
 }

@@ -480,7 +480,6 @@ public final class Utils
 			TTTTTTTTTTTTTTTT = binary 11111111111111111111111111111111 = decimal 4,294,967,295 = 2* Integer.MAX_VALUE  + 1
 		 */
 		
-		//validKmerHashes = new OpenBitSet(((Integer.MAX_VALUE + 1)*2)-1);
 		long numBits = 2*(long)Integer.MAX_VALUE  + 1; 
 		validKmerHashes = new OpenBitSet(numBits);
 		
@@ -496,26 +495,11 @@ public final class Utils
 			
 			while (line != null)
 			{
-				/*String[] str = line.split("\\s+");
-				if(str.length > 2 )
-				{
-					throw new MhapRuntimeException("Valid kmer file must have at most two columns [kmer kmer_percent].");
-				}
-				kmer = str[0];
-				kmerHash = Utils.computeHashYGS(kmer);
-				validKmerHashes.set(kmerHash);
-				
-				kmer_rc = Utils.rc(kmer);
-				kmerHash = Utils.computeHashYGS(kmer_rc);
-				validKmerHashes.set(kmerHash);
-				*/
 				kmerHash = Utils.computeHashYGS(line);
-				//validKmerHashes.set(kmerHash);  //Bernardo
 				validKmerHashes.fastSet(kmerHash);
 				
 				kmer_rc = Utils.rc(line);
 				kmerHash = Utils.computeHashYGS(kmer_rc);
-				//validKmerHashes.set(kmerHash);  //Bernardo
 				validKmerHashes.fastSet(kmerHash);
 				
 				line = bf.readLine();
@@ -553,7 +537,7 @@ public final class Utils
 		
 	}
 
-	private static long computeHashYGS(String kmer) 
+	public static long computeHashYGS(String kmer) 
 	{
 		String kmerBinary;
 		kmerBinary = kmer.replaceAll("A", "00");
