@@ -1,11 +1,16 @@
-package edu.umd.marbl.mhap;
+package test.edu.umd.marbl.mhap;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.lucene.util.OpenBitSet;
 import org.testng.annotations.Test;
@@ -15,7 +20,7 @@ import edu.umd.marbl.mhap.utils.Utils;
 
 public class ValidBitVectorsFileBuilderFunctionalTest 
 {
-	final private String validKmersFile = "/tmp/testKmerFile.kmer";
+	final private String validKmersFile = "testKmerFile.kmer";
 	final private String validBitVectorsFileName = "testFile.bitVector";
 	
 	@Test
@@ -72,6 +77,40 @@ public class ValidBitVectorsFileBuilderFunctionalTest
 			assertTrue(validKmersHashesGenerated.get(kmerHash));
 			
 			line = bf.readLine();
+		}
+	}
+	
+	@Test
+	public void test_ReadBitVEctorFile_ShouldHaveSameKmersFromFile() throws Exception
+	{
+		ValidBitVectorsFileBuilder bitVectorsBuilder = new ValidBitVectorsFileBuilder();
+		
+		OpenBitSet validKmersHashes = null;
+		OpenBitSet validKmersHashesGenerated = null;
+		List<String> storedKmers = new ArrayList<String>();
+		
+		long numBits = 2*(long)Integer.MAX_VALUE  + 1;
+		
+		Utils.createValidKmerFilter(validKmersFile, 16, 0);
+		validKmersHashes = Utils.getValidKmerHashes();
+		bitVectorsBuilder.createValidBitVectorsFile(validBitVectorsFileName, validKmersHashes);
+		
+		File bitVectorFile = new File(validBitVectorsFileName);
+		assertTrue(bitVectorFile.exists());
+		
+		validKmersHashesGenerated = bitVectorsBuilder.readValidBitVectorsFile(validBitVectorsFileName);
+		
+		assertNotNull(validKmersHashes);
+		
+		for(long i = 0; i < 10000; i++)
+		{
+			if(validKmersHashesGenerated.get(i))
+				storedKmers.add(Utils.reverseComputeHashYGS(i));
+		}
+		
+		for(String kmer : storedKmers)
+		{
+			System.out.println(kmer);
 		}
 	}
 }

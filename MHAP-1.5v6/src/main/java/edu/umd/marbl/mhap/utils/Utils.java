@@ -550,6 +550,40 @@ public final class Utils
 		return val;
 	}
 	
+	public static String reverseComputeHashYGS(long index) 
+	{
+		String binarySequence = Long.toBinaryString(index);
+		
+		if(binarySequence.length() < 32)
+			binarySequence = completeZeros(binarySequence);
+		
+		String binaryBase;
+		String seq = "";
+		for(int i = 0; i < 32; i = i + 2)
+		{
+			binaryBase = binarySequence.substring(i, i+2);
+			binaryBase = binaryBase.replaceAll("00", "A");
+			binaryBase = binaryBase.replaceAll("01", "C");
+			binaryBase = binaryBase.replaceAll("10", "G");
+			binaryBase = binaryBase.replaceAll("11", "T");
+			
+			seq += binaryBase;
+		}
+		
+		System.out.println(binarySequence + ">>" + seq);
+		return binarySequence;
+	}
+	
+	private static String completeZeros(String kmer) 
+	{
+		while(kmer.length() < 32)
+		{
+			kmer = "0"+kmer;
+		}
+		
+		return kmer;
+	}
+	
 	public static long[] computeHashYGSToArray(String seq, int kmerSize) 
 	{
 		//HashFunction hf = Hashing.murmur3_128(seed);
