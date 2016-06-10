@@ -98,6 +98,7 @@ public final class MhapMain
 		// set the locale
 		Locale.setDefault(Locale.US);
 		
+		ParseOptions options = new ParseOptions();
 		options.addStartTextLine("MHAP: MinHash Alignment Protocol. A tool for overlapping long-read sequences in bioinformatics.");
 		options.addStartTextLine("\tVersion: "+PackageInfo.VERSION+", Build time: "+PackageInfo.BUILD_TIME);		
 		options.addStartTextLine("\tUsage 1 (direct execution): java -server -Xmx<memory> -jar <MHAP jar> -s<fasta/dat from/self file> [-q<fasta/dat to file>] [-f<kmer filter list, must be sorted>]");
@@ -297,6 +298,7 @@ public final class MhapMain
 		String validBitVectorsName = this.validKmersFile + ".bitvector";
 		File validBitVectors = new File(validBitVectorsName);
 		
+		System.out.println("Reading");
 		// read in the valid kmer set (will be included)
 		if(!this.validKmersFile.isEmpty())
 		{
