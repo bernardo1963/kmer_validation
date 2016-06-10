@@ -24,7 +24,7 @@ public class ValidBitVectorsFileBuilderFunctionalTest
 	final private String validKmersFile = "testKmerFile.kmer";
 	final private String validBitVectorsFileName = "testFile.bitVector";
 	
-	@Test
+	//@Test
 	public void test_CreateBitVectorFile_ShouldCreateBitVectorsFile() throws IOException
 	{
 		ValidBitVectorsFileBuilder bitVectorsBuilder = new ValidBitVectorsFileBuilder();
@@ -42,7 +42,7 @@ public class ValidBitVectorsFileBuilderFunctionalTest
 		assertTrue(bitVectorFile.exists());
 	}
 	
-	@Test
+	//@Test
 	public void test_ReadBitVectorFile_ShouldReadBitVectorsFileToOpenBitSet() throws IOException
 	{
 		ValidBitVectorsFileBuilder bitVectorsBuilder = new ValidBitVectorsFileBuilder();
