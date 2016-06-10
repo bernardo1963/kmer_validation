@@ -570,8 +570,7 @@ public final class Utils
 			seq += binaryBase;
 		}
 		
-		System.out.println(binarySequence + ">>" + seq);
-		return binarySequence;
+		return seq;
 	}
 	
 	private static String completeZeros(String kmer) 

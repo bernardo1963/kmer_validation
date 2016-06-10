@@ -1,4 +1,4 @@
-package test.edu.umd.marbl.mhap;
+package edu.umd.marbl.mhap;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -8,6 +8,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +85,7 @@ public class ValidBitVectorsFileBuilderFunctionalTest
 	public void test_ReadBitVEctorFile_ShouldHaveSameKmersFromFile() throws Exception
 	{
 		ValidBitVectorsFileBuilder bitVectorsBuilder = new ValidBitVectorsFileBuilder();
+		FileWriter writer = new FileWriter("kmersFromBinaryFile.kmer");
 		
 		OpenBitSet validKmersHashes = null;
 		OpenBitSet validKmersHashesGenerated = null;
@@ -102,7 +104,7 @@ public class ValidBitVectorsFileBuilderFunctionalTest
 		
 		assertNotNull(validKmersHashes);
 		
-		for(long i = 0; i < 10000; i++)
+		for(long i = 0; i < numBits; i++)
 		{
 			if(validKmersHashesGenerated.get(i))
 				storedKmers.add(Utils.reverseComputeHashYGS(i));
@@ -110,7 +112,11 @@ public class ValidBitVectorsFileBuilderFunctionalTest
 		
 		for(String kmer : storedKmers)
 		{
-			System.out.println(kmer);
+			writer.write(kmer);
+			writer.write("\n");
 		}
+		
+		writer.close();
 	}
+	
 }
