@@ -81,42 +81,4 @@ public class ValidBitVectorsFileBuilderFunctionalTest
 		}
 	}
 	
-	@Test
-	public void test_ReadBitVEctorFile_ShouldHaveSameKmersFromFile() throws Exception
-	{
-		ValidBitVectorsFileBuilder bitVectorsBuilder = new ValidBitVectorsFileBuilder();
-		FileWriter writer = new FileWriter("kmersFromBinaryFile.kmer");
-		
-		OpenBitSet validKmersHashes = null;
-		OpenBitSet validKmersHashesGenerated = null;
-		List<String> storedKmers = new ArrayList<String>();
-		
-		long numBits = 2*(long)Integer.MAX_VALUE  + 1;
-		
-		Utils.createValidKmerFilter(validKmersFile, 16, 0);
-		validKmersHashes = Utils.getValidKmerHashes();
-		bitVectorsBuilder.createValidBitVectorsFile(validBitVectorsFileName, validKmersHashes);
-		
-		File bitVectorFile = new File(validBitVectorsFileName);
-		assertTrue(bitVectorFile.exists());
-		
-		validKmersHashesGenerated = bitVectorsBuilder.readValidBitVectorsFile(validBitVectorsFileName);
-		
-		assertNotNull(validKmersHashes);
-		
-		for(long i = 0; i < numBits; i++)
-		{
-			if(validKmersHashesGenerated.get(i))
-				storedKmers.add(Utils.reverseComputeHashYGS(i));
-		}
-		
-		for(String kmer : storedKmers)
-		{
-			writer.write(kmer);
-			writer.write("\n");
-		}
-		
-		writer.close();
-	}
-	
 }

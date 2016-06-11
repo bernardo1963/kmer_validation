@@ -73,6 +73,7 @@ public final class MhapMain
 	private final String toFile;
 	private final boolean weighted;
 	private final String validKmersFile;
+	
 	private static ParseOptions options;
 	
 	private final KmerCounts kmerCounter;
@@ -95,6 +96,8 @@ public final class MhapMain
 	private static final int DEFAULT_SUB_SEQUENCE_SIZE = 100000;
 	public static void main(String[] args) throws Exception
 	{
+		boolean createKmersFileFromBitVectors;
+		
 		// set the locale
 		Locale.setDefault(Locale.US);
 		
@@ -123,7 +126,7 @@ public final class MhapMain
 		options.addOption("--pacbio_sensitive", "Set all the parameters for the PacBio sensitive settings. This is the current best guidance, and could change at any time without warning.", false);
 		options.addOption("--pacbio_experimental", "Set all the parameters for the PacBio experimental settings. This is the current best guidance, and could change at any time without warning.", false);
 		options.addOption("--valid-kmers", "File of valid kmers to be used as filter for the hashes", "");
-		
+		options.addOption("--generate-kmers-from-bitvector", "To be used with the --valid-kmers option. Takes the kmers file, generate the bitvectors file and create a new kmers file. Used for tests. Does not run MHAP, only creates kmers file", false);
 		if (!options.process(args))
 			System.exit(0);
 		
@@ -268,12 +271,27 @@ public final class MhapMain
 		System.err.println("Version = "+PackageInfo.VERSION);
 		System.err.println("Build time = "+PackageInfo.BUILD_TIME);
 		System.err.println(options);
-
-		// start the main program
-		MhapMain main = new MhapMain(options);
-
-		//execute main computation code
-		main.computeMain();
+		
+		createKmersFileFromBitVectors = options.get("--generate-kmers-from-bitvector").getBoolean();
+		
+		if(createKmersFileFromBitVectors)
+		{
+			ValidBitVectorsFileBuilder validBitVectorsFileBuilder = new ValidBitVectorsFileBuilder();
+			String validKmersFile = options.get("--valid-kmers").getString();
+			String validBitVectorsFileName = validKmersFile + ".bitvector";
+			int kmerSize = options.get("-k").getInteger();
+			
+			System.err.println("Running the creation of the kmers file for tests.");
+			validBitVectorsFileBuilder.createKmersFileFromBinaryBitVectors(validKmersFile, validBitVectorsFileName, kmerSize);
+		}
+		else
+		{
+			// start the main program
+			MhapMain main = new MhapMain(options);
+			
+			//execute main computation code
+			main.computeMain();
+		}
 	}
 
 	public MhapMain(ParseOptions options) throws Exception 
