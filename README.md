@@ -10,7 +10,7 @@ You must have a recent  [JDK](http://www.oracle.com/technetwork/java/javase/down
     cd MHAP-1.5v6
     ant
     
-For a quick user-quide, run:
+For a quick run:
 
     cd target
     java -Xmx3g -server -jar mhap-1.5v6.jar -s <the fasta file to be used> -q <the fasta file to be compared> --valid-kmers <the file of the valid kmers to be used as filter for the hashes>
