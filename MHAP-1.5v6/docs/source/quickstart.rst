@@ -70,4 +70,6 @@ The full list of options is available via command-line help (--help or -h). Belo
    --num-threads  [int]  The number of threads to use for computation, default (2 x #cores on system)
    --no-self  Do not compute self-matches for sequences in the -s file, default=false
    --store-full-id  Output full sequence ID from the input FastA file. Otherwise, the output is the position of the sequence in the file (i.e. first sequence gets ID=1, second gets ID=2, and so on), default=false
-
+   --valid-kmers File of valid kmers to be used as filter for the hashes (Added by Carvalho, Dupim and Nassar. Improved assembly of noisy long reads by k-mer validation. Genome Research, in press)
+   --generate-kmers-from-bitvector To be used with the --valid-kmers option. Takes the kmers file, generate the bitvectors file and create a new kmers file. Used for tests. Does not run MHAP, only creates kmers file (Added by Carvalho, Dupim and Nassar. Improved assembly of noisy long reads by k-mer validation. Genome Research, in press)
+		
