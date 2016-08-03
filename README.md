@@ -17,7 +17,7 @@ For a quick run:
 
 ## Files
 
-The sequences directory contains the files that can be used as a test with the java command above. The "fragment_A.fasta" file is to be used with the -s option, the "fragment_B.fasta" is to be used with the -q option and the "valid_kmers.kmer2" is to bem used with the --valid-kmers option.
+The sequences directory contains the files that can be used as a test with the java command above. The "fragment_A.fasta" file is to be used with the -s option, the "fragment_B.fasta" is to be used with the -q option and the "valid_kmers.kmer2" is to be used with the --valid-kmers option.
 
 Using those files the command to run MHAP would be:
 
