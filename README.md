@@ -19,11 +19,11 @@ For a quick test:
 
 ## Files
 
-The folder "assemblies" contain the PacBio assemblies of D. melanogaster, C. elegans, and A. thaliana using the three assembly methods (standard MHAP, k-mer validation with low frequency masking, and k-mer validation with low and high frequency masking).
+The directory "assemblies" contain the PacBio assemblies of D. melanogaster, C. elegans, and A. thaliana using the three assembly methods (standard MHAP, k-mer validation with low frequency masking, and k-mer validation with low and high frequency masking).
 
-The folder "code"  contains the modified MHAP and some additional files. The original MHAP code is described in Berlin et al 2015. Assembling large genomes with single-molecule sequencing and locality-sensitive hashing. Nature Biotechnology 33(6): 623-630
+The directory "code"  contains the modified MHAP and some additional files. The original MHAP code is described in Berlin et al 2015. 
 
-The folder code/sequences contains the files that can be used for the quick test as follows: 
+The directory code/sequences contains the files that can be used for the quick test as follows: 
 
     java -Xmx3g -server -jar mhap-1.5v6.jar -s ../../sequences/fragment_A.fasta -q ../../sequences/fragment_B.fasta --valid-kmers ../../sequences/valid_kmers.kmer2
 
@@ -63,7 +63,7 @@ PBcR_v6  -length 500  -l dros_LH   -s ~/mhap_v6.spec  valid_kmer_file=dros_L13_U
 
  The spec file mhap_v6.spec follows:
 
-#mhap_v6.spec  based on UFSCAR_v5.spec   generic spec for running PBcR_v6 in a 24-core machine with 144 Gb RAM.  
+###mhap_v6.spec  based on UFSCAR_v5.spec   generic spec for running PBcR_v6 in a 24-core machine with 144 Gb RAM.  
 ovlMemory=96
 merylMemory=96000
 ovlStoreMemory=96000
