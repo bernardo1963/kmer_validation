@@ -64,7 +64,7 @@ PBcR_v6  -length 500  -l dros_LH   -s ~/mhap_v6.spec  valid_kmer_file=dros_L13_U
  The spec file mhap_v6.spec follows:
 
  #mhap_v6.spec    generic spec for running PBcR_v6 in a 24-core machine with 144 Gb RAM.  
-ovlMemory=96 
+ovlMemory=96  
 merylMemory=96000 
  ovlStoreMemory=96000
 cnsConcurrency=24
