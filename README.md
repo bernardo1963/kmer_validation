@@ -65,17 +65,17 @@ PBcR_v6  -length 500  -l dros_LH   -s ~/mhap_v6.spec  valid_kmer_file=dros_L13_U
 
  #mhap_v6.spec    generic spec for running PBcR_v6 in a 24-core machine with 144 Gb RAM.  
 ovlMemory=96  
-merylMemory=96000 
- ovlStoreMemory=96000
-cnsConcurrency=24
-consensusConcurrency=24
-threads=24
-assemble=1
-javaPath=/home3/users/bernardo/programs/jdk1.8.0_60/bin
-frgCorrThreads=4
-frgCorrConcurrency=6
-mhap_jar=/home3/users/bernardo/programs/wgs-8.3rc2/Linux-amd64/lib/java/mhap-1.5v6.jar
-mhap=-k 16 --num-hashes 512 --num-min-matches 3 --threshold 0.04 --filter-threshold 0.000005 --weighted
+merylMemory=96000  
+ovlStoreMemory=96000  
+cnsConcurrency=24  
+consensusConcurrency=24  
+threads=24  
+assemble=1  
+javaPath=/home3/users/bernardo/programs/jdk1.8.0_60/bin  
+frgCorrThreads=4  
+frgCorrConcurrency=6  
+mhap_jar=/home3/users/bernardo/programs/wgs-8.3rc2/Linux-amd64/lib/java/mhap-1.5v6.jar  
+mhap=-k 16 --num-hashes 512 --num-min-matches 3 --threshold 0.04 --filter-threshold 0.000005 --weighted  
 
 
 
