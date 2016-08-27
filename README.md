@@ -6,7 +6,7 @@ The original MHAP code is described in Berlin et al 2015. Assembling large genom
 
 ## Build
 
-The compiled file mhap-1.5v6.jar is provided for convenience. If you want to compile it from the source code, follow the instructions below:
+The compiled file mhap-1.5v6.jar is provided for convenience. If you want to compile it from the source code, follow the instructions below:  
 You must have a recent  [JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html "JDK") and [Apache ANT](http://ant.apache.org/ "ANT") available. To checkout and build run:
 
     git clone https://github.com/bernardo1963/kmer_validation.git
