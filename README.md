@@ -6,16 +6,17 @@ The original MHAP code is described in Berlin et al 2015. Assembling large genom
 
 ## Build
 
+The compiled file mhap-1.5v6.jar is provided for convenience. If you want to compile it from the source code, follow the instructions below:
 You must have a recent  [JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html "JDK") and [Apache ANT](http://ant.apache.org/ "ANT") available. To checkout and build run:
 
     git clone https://github.com/bernardo1963/kmer_validation.git
-    cd code/MHAP-1.5v6
+    cd kmer_validation/code/MHAP-1.5v6
     ant
     
 For a quick test:
 
     cd target
-    java -Xmx3g -server -jar mhap-1.5v6.jar -s <the fasta file to be used> -q <the fasta file to be compared> --valid-kmers <the file of the valid kmers used as filter to remove error and repetitive k-mers>
+    java -Xmx10g -server -jar mhap-1.5v6.jar -s <the fasta file to be used> -q <the fasta file to be compared> --valid-kmers <the file of the valid kmers used as filter to remove error and repetitive k-mers>
 
 ## Files
 
@@ -23,9 +24,11 @@ The directory "assemblies" contain the PacBio assemblies of D. melanogaster, C. 
 
 The directory "code"  contains the modified MHAP and some additional files. The original MHAP code is described in Berlin et al 2015. 
 
-The directory code/sequences contains the files that can be used for the quick test as follows: 
+The directory "code/test" contains the files that can be used for the quick test as follows: 
 
-    java -Xmx3g -server -jar mhap-1.5v6.jar -s ../../sequences/fragment_A.fasta -q ../../sequences/fragment_B.fasta --valid-kmers ../../sequences/valid_kmers.kmer2
+    java -Xmx10g -server -jar mhap-1.5v6.jar -s ../../test/melR6_frag_A.PB.fasta -q ../../test/melR6_frag_B.PB.fasta --valid-kmers ../../test/melR6_frag_AB.PB.kmer2 --no-self --num-hashes 128 --num-min-matches 3 --threshold 0.04  --weighted
+
+You should get 15 matches with k-mer validation, and 2 matches without it (i.e., without  the --valid-kmers option ). 
 
  
 ## Running MHAP / PBcR with k-mer validation.
@@ -43,27 +46,27 @@ The modified script PBcR_v6  should be copied to the same directory of the origi
 In order to run mhap-1.5v6 (either alone or within the PBcR_v6 script) with k-mer validation, it is also necessary a file with the list of valid k-mers , which  can be generated as follows:
 1) download the Illumina fastq files (e.g., the Drosophila ISO-1 Illumina reads).
 2) Run jellyfish count as follows:
-   zcat 2057_*.fastq.gz | jellyfish count -Q "+"  -m 16 -s 10G  -t 8 -o Illumina_q10_C.jelly -C  /dev/fd/0
+    zcat 2057_*.fastq.gz | jellyfish count -Q "+"  -m 16 -s 10G  -t 8 -o Illumina_q10_C.jelly -C  /dev/fd/0
 3) Run jellyfish dump as follows:
-   jellyfish dump -c -L 13 -U 150 Illumina_q10_C.jelly  | awk '(1==1){print $1}' > dros_L13_U150.kmer  #for LH-masking
-   jellyfish dump -c -L 13        Illumina_q10_C.jelly  | awk '(1==1){print $1}' > dros_L13.kmer       #for L-masking
+    jellyfish dump -c -L 13 -U 150 Illumina_q10_C.jelly  | awk '(1==1){print $1}' > dros_L13_U150.kmer  #for LH-masking
+    jellyfish dump -c -L 13        Illumina_q10_C.jelly  | awk '(1==1){print $1}' > dros_L13.kmer       #for L-masking
 
 
 A typical command line for  running mhap-1.5v6 alone:
 
-java -Xmx48g -server -jar  mhap-1.5v6.jar -s melR6_frag_A.PB.fasta  -q melR6_frag_B.PB.fasta  --no-self --num-hashes 512 --num-min-matches 3 --threshold 0.04  --weighted --valid-kmers dros_L13_U150.kmer
+    java -Xmx48g -server -jar  mhap-1.5v6.jar -s melR6_frag_A.PB.fasta  -q melR6_frag_B.PB.fasta  --no-self --num-hashes 512 --num-min-matches 3 --threshold 0.04  --weighted --valid-kmers dros_L13_U150.kmer
 
 If run without the  --valid-kmers option the modified MHAP produces an output which is identical to the original MHAP code.
     
 
 A typical command line for assembly with k-mer validation is:
 
-PBcR_v6  -length 500  -l dros_LH   -s ~/mhap_v6.spec  valid_kmer_file=dros_L13_U150.kmer  -fastq ./dmel_filtered.fastq  genomeSize=180000000 > dros_LH.out 2>&1      
+    PBcR_v6  -length 500  -l dros_LH   -s ~/mhap_v6.spec  valid_kmer_file=dros_L13_U150.kmer  -fastq ./dmel_filtered.fastq  genomeSize=180000000 > dros_LH.out 2>&1      
       
 
  The spec file mhap_v6.spec follows:
 
- #mhap_v6.spec    generic spec for running PBcR_v6 in a 24-core machine with 144 Gb RAM.  
+ #mhap_v6.spec  based on UFSCAR_v5.spec   generic spec for running PBcR_v6 in a 24-core machine with 144 Gb RAM.  
 ovlMemory=96  
 merylMemory=96000  
 ovlStoreMemory=96000  
